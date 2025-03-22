@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Positive Affirmations</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="card" class="card">
+            <div class="affirmation-text">Click Shuffle to begin!</div>
+        </div>
+        <div class="controls">
+            <button id="prevBtn" class="btn">← Previous</button>
+            <span id="counter" class="counter">0/15</span>
+            <button id="nextBtn" class="btn">Next →</button>
+        </div>
+        <button id="shuffleBtn" class="btn shuffle">Shuffle Deck</button>
+    </div>
+
+    <script>
+        let affirmations = [];
+        let currentDeck = [];
+        let currentIndex = 0;
+
+        // Load affirmations from JSON file
+        fetch('affirmations.json')
+            .then(response => response.json())
+            .then(data => {
+                affirmations = data;
+                shuffleDeck();
+            });
+
+        function shuffleDeck() {
+            // Create a copy and shuffle
+            const shuffled = [...affirmations].sort(() => Math.random() - 0.5);
+            
+            // Select first 15 or all if less than 15
+            currentDeck = shuffled.slice(0, 15);
+            
+            // Shuffle the selected deck
+            currentDeck = currentDeck.sort(() => Math.random() - 0.5);
+            
+            currentIndex = 0;
+            updateCard();
+        }
+
+        function updateCard() {
+            const cardText = document.querySelector('.affirmation-text');
+            const counter = document.querySelector('#counter');
+            
+            cardText.textContent = currentDeck[currentIndex] || "No affirmations found";
+            counter.textContent = `${currentIndex + 1}/${currentDeck.length}`;
+        }
+
+        // Event Listeners
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % currentDeck.length;
+            updateCard();
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + currentDeck.length) % currentDeck.length;
+            updateCard();
+        });
+
+        document.getElementById('shuffleBtn').addEventListener('click', shuffleDeck);
+    </script>
+</body>
+</html>
